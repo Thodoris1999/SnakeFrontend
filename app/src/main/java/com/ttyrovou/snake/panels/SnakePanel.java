@@ -3,18 +3,23 @@ package com.ttyrovou.snake.panels;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.Toast;
 
 import com.ttyrovou.snake.MainThread;
+import com.ttyrovou.snake.R;
 import com.ttyrovou.snake.sprites.Background;
+import com.ttyrovou.snake.sprites.SnakeBoard;
 
 public class SnakePanel extends SurfaceView implements SurfaceHolder.Callback {
 
     private MainThread thread;
-    Background background;
+    private Background background;
+    private SnakeBoard snakeBoard;
 
     public SnakePanel(Context context) {
         super(context);
@@ -33,14 +38,28 @@ public class SnakePanel extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     protected void onDraw(Canvas canvas) {
         background.draw(canvas);
+        snakeBoard.draw(canvas);
+        Drawable ladder;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            ladder = getResources().getDrawable(R.drawable.ic_ladder, null);
+        } else
+            ladder = getResources().getDrawable(R.drawable.ic_ladder);
+        ladder.setBounds(new Rect(0, 0, 100, 100));
+        ladder.draw(canvas);
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        background = new Background(getWidth(), getHeight(), Color.rgb(255, 153, 51));
+        initGraphics();
 
         thread.setRunning(true);
         thread.start();
+    }
+
+    public void initGraphics() {
+        background = new Background(getWidth(), getHeight(), Color.rgb(255, 183, 81));
+        snakeBoard = new SnakeBoard(10, 10, (int) (getWidth() * 0.9), (int) (getHeight() * 0.6), (int) (getWidth() * 0.05),
+                (int) (getHeight() * 0.1));
     }
 
     @Override
