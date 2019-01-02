@@ -18,6 +18,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
+        android:id="@+id/board_rows_edittext"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:inputType="number"
@@ -37,6 +38,7 @@
         app:layout_constraintTop_toTopOf="@id/board_rows_textview" />
 
     <EditText
+        android:id="@+id/board_columns_edittext"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:inputType="number"
@@ -56,6 +58,7 @@
         app:layout_constraintTop_toTopOf="@id/board_columns_textview" />
 
     <EditText
+        android:id="@+id/num_players_editview"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:inputType="number"
@@ -67,6 +70,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="64dp"
+        android:onClick="startGame"
         android:text="start"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

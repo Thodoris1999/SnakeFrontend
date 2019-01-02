@@ -5,21 +5,19 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
-import android.support.v7.app.WindowDecorActionBar;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.Toast;
 
-import com.ttyrovou.snake.GameOverScreen;
+import com.ttyrovou.snake.sprites.GameOverScreen;
 import com.ttyrovou.snake.MainThread;
 import com.ttyrovou.snake.sprites.Background;
 import com.ttyrovou.snake.sprites.PlayerSprite;
 import com.ttyrovou.snake.sprites.SnakeBoard;
 
-import java.util.LinkedList;
-
 import main.Game;
+import main.GameConfig;
 import main.Player;
 import timber.log.Timber;
 
@@ -33,14 +31,13 @@ public class SnakePanel extends SurfaceView implements SurfaceHolder.Callback, P
     private Game game;
     private GameOverScreen gameOverScreen;
     private boolean gameOver = false;
-
     private boolean uienabled = true;
 
-    public SnakePanel(Context context) {
+    public SnakePanel(Context context, GameConfig config) {
         super(context);
 
         this.context = context;
-        game = new Game(2, 50, this);;
+        game = new Game(config, this);
 
         thread = new MainThread(getHolder(), this);
 
@@ -105,9 +102,11 @@ public class SnakePanel extends SurfaceView implements SurfaceHolder.Callback, P
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN && uienabled) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN && uienabled && !gameOver) {
             Toast.makeText(getContext(), "x: " + event.getX() + ", y: " + event.getY(), Toast.LENGTH_SHORT).show();
             game.progressTurn();
+        } else if (gameOver) {
+
         }
         return super.onTouchEvent(event);
     }
@@ -151,18 +150,14 @@ public class SnakePanel extends SurfaceView implements SurfaceHolder.Callback, P
     public void onAnimationCompleted() {
         uienabled = true;
         snakeBoard.updateBoard(game.getBoard());
-        checkForGameEnd();
-    }
-
-    private void checkForGameEnd() {
-        if (game.getMaxRounds() == game.getRound()) {
+        if (game.isGameOver()) {
             int maxScoreIndex = 0;
             for (int i = 0; i < game.getGamePlayers().size(); i++) {
                 if (game.getGamePlayers().get(i).getScore() > game.getGamePlayers().get(maxScoreIndex).getScore())
                     maxScoreIndex = i;
             }
 
-            gameOverScreen = new GameOverScreen((int) (getWidth() * 0.1), (int) (getHeight() * 0.3),
+            gameOverScreen = new GameOverScreen(context, (int) (getWidth() * 0.1), (int) (getHeight() * 0.3),
                     (int) (getWidth() * 0.8), (int) (getHeight() * 0.4), game.getGamePlayers().get(maxScoreIndex).getName());
             gameOver = true;
         }
