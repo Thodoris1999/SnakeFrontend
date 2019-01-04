@@ -1,6 +1,7 @@
 package com.ttyrovou.snake.panels;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -8,11 +9,11 @@ import android.graphics.Rect;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.widget.Toast;
 
-import com.ttyrovou.snake.sprites.GameOverScreen;
+import com.ttyrovou.snake.MainMenuActivity;
 import com.ttyrovou.snake.MainThread;
 import com.ttyrovou.snake.sprites.Background;
+import com.ttyrovou.snake.sprites.GameOverScreen;
 import com.ttyrovou.snake.sprites.PlayerSprite;
 import com.ttyrovou.snake.sprites.SnakeBoard;
 
@@ -32,14 +33,14 @@ public class SnakePanel extends SurfaceView implements SurfaceHolder.Callback, P
     private GameOverScreen gameOverScreen;
     private boolean gameOver = false;
     private boolean uienabled = true;
+    private GameConfig currentGameConfig;
 
     public SnakePanel(Context context, GameConfig config) {
         super(context);
 
         this.context = context;
+        this.currentGameConfig = config;
         game = new Game(config, this);
-
-        thread = new MainThread(getHolder(), this);
 
         getHolder().addCallback(this);
         setFocusable(true);
@@ -69,8 +70,11 @@ public class SnakePanel extends SurfaceView implements SurfaceHolder.Callback, P
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
         initGraphics();
 
-        thread.setRunning(true);
+        Timber.e("Surface created");
+        thread = new MainThread(getHolder(), this);
         thread.start();
+        thread.setRunning(true);
+
     }
 
     public void initGraphics() {
@@ -90,23 +94,29 @@ public class SnakePanel extends SurfaceView implements SurfaceHolder.Callback, P
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
         boolean retry = true;
+        thread.setRunning(false);
         while (retry) {
             try {
                 thread.join();
-                retry = false;
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+            retry = false;
         }
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN && uienabled && !gameOver) {
-            Toast.makeText(getContext(), "x: " + event.getX() + ", y: " + event.getY(), Toast.LENGTH_SHORT).show();
             game.progressTurn();
         } else if (gameOver) {
-
+            if (gameOverScreen.isRetryClciked(event.getX(), event.getY())) {
+                game = new Game(currentGameConfig, this);
+                initGraphics();
+                gameOver = false;
+            } else if (gameOverScreen.isMainMenuClicked(event.getX(), event.getY())) {
+                context.startActivity(new Intent(context, MainMenuActivity.class));
+            }
         }
         return super.onTouchEvent(event);
     }
@@ -115,7 +125,6 @@ public class SnakePanel extends SurfaceView implements SurfaceHolder.Callback, P
     public void onMoveEvent(Player player, int oldPos, int newPos, Player.MoveEvent moveEvent) {
         int playerIndex = game.findPlayerIndexById(player.getPlayerId());
         PlayerSprite movedPlayerSprite = playerSprites[playerIndex];
-        Timber.d("move info " + oldPos + " " + newPos + " " + moveEvent);
         switch (moveEvent) {
             case MOVE_DUE_TO_DIE_THROW: {
                 uienabled = false;
@@ -124,17 +133,20 @@ public class SnakePanel extends SurfaceView implements SurfaceHolder.Callback, P
                     movedPlayerSprite.startAnimation(destination);
                 }
                 break;
-            } case MOVE_DUE_TO_LADDER: {
+            }
+            case MOVE_DUE_TO_LADDER: {
                 uienabled = false;
                 Rect destination = snakeBoard.getTileById(newPos).getRect();
                 movedPlayerSprite.startAnimation(destination);
                 break;
-            } case MOVE_DUE_TO_SNAKE: {
+            }
+            case MOVE_DUE_TO_SNAKE: {
                 uienabled = false;
                 Rect destination = snakeBoard.getTileById(newPos).getRect();
                 movedPlayerSprite.startAnimation(destination);
                 break;
-            } case TURN_COMPLETED: {
+            }
+            case TURN_COMPLETED: {
                 // indicates the end of a turn
                 movedPlayerSprite.startAnimation(null);
             }

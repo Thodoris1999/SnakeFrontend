@@ -5,8 +5,9 @@ import android.view.SurfaceHolder;
 
 import com.ttyrovou.snake.panels.SnakePanel;
 
-public class MainThread extends Thread {
+import timber.log.Timber;
 
+public class MainThread extends Thread {
 
     private final static int MAX_FPS = 25;
     private final static int MAX_FRAME_SKIPS = 5;
@@ -21,6 +22,10 @@ public class MainThread extends Thread {
         this.snakePanel = snakePanel;
     }
 
+    public void setRunning(boolean running) {
+        this.running = running;
+    }
+
     @Override
     public void run() {
         Canvas canvas = null;
@@ -28,6 +33,7 @@ public class MainThread extends Thread {
             try {
                 canvas = surfaceHolder.lockCanvas();
                 synchronized (surfaceHolder) {
+                    if (!running) break;
                     long beginTime = System.currentTimeMillis();
                     int framesSkipped = 0;
 
@@ -55,9 +61,5 @@ public class MainThread extends Thread {
                 }
             }
         }
-    }
-
-    public void setRunning(boolean running) {
-        this.running = running;
     }
 }

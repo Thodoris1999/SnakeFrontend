@@ -40,11 +40,12 @@ public class Apple extends BaseSprite {
         this.points = points;
         if (points > 0) {
             appleSprite = context.getResources().getDrawable(R.drawable.ic_apple);
+            appleSprite.setBounds(x, y, x + width, y + height);
         } else if (points < 0) {
             // TODO: change to black apple
             appleSprite = context.getResources().getDrawable(R.drawable.ic_apple);
+            appleSprite.setBounds(x, y, x + width, y + height);
         }
-        appleSprite.setBounds(x, y, x + width, y + height);
     }
 
     @Override
