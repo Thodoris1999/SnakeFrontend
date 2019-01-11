@@ -5,21 +5,21 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 
+import main.GameConfig;
+import main.PlayerType;
 import timber.log.Timber;
 
 public class MainMenuActivity extends AppCompatActivity {
 
-    public static final String NUM_ROWS_KEY = "num-rows";
-    public static final String NUM_COLS_KEY = "num-cols";
-    public static final String NUM_PLAYERS_KEY = "num-players";
-    public static final String NUM_LADDERS_KEY = "num-ladders";
-    public static final String NUM_SNAKES_KEY = "num-snakes";
-    public static final String NUM_APPLES_KEY = "num-apples";
+    public static final String GAME_CONFIG_KEY = "game-config key";
 
     private EditText numRowsEdittext, numColsEdittext, numPlayersEdittext,
             numLaddersEdittext, numSnakesEdittext, numApplesEdittext;
+    private Spinner player1TypeSpinner, player2TypeSpinner;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -34,6 +34,15 @@ public class MainMenuActivity extends AppCompatActivity {
         numLaddersEdittext = findViewById(R.id.num_ladders_editview);
         numSnakesEdittext = findViewById(R.id.num_snakes_editview);
         numApplesEdittext = findViewById(R.id.num_apples_editview);
+
+        player1TypeSpinner = findViewById(R.id.player1_type);
+        player2TypeSpinner = findViewById(R.id.player2_type);
+
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter
+                .createFromResource(this, R.array.player_type_options, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        player1TypeSpinner.setAdapter(adapter);
+        player2TypeSpinner.setAdapter(adapter);
     }
 
     public void startGame(View view) {
@@ -44,13 +53,34 @@ public class MainMenuActivity extends AppCompatActivity {
         int numSnakes = Integer.parseInt(numSnakesEdittext.getText().toString());
         int numApples = Integer.parseInt(numApplesEdittext.getText().toString());
 
+        PlayerType[] playerTypes = new PlayerType[numPlayers];
+        if (numPlayers == 2) {
+            if (player1TypeSpinner.getSelectedItem().equals("Normal player")) {
+                playerTypes[0] = PlayerType.NORMAL;
+            } else if (player1TypeSpinner.getSelectedItem().equals("Heuristic player")) {
+                playerTypes[0] = PlayerType.HEURISTIC;
+            } else if (player1TypeSpinner.getSelectedItem().equals("Minmax player")) {
+                playerTypes[0] = PlayerType.MINMAX;
+            }
+            if (player2TypeSpinner.getSelectedItem().equals("Normal player")) {
+                playerTypes[1] = PlayerType.NORMAL;
+            } else if (player2TypeSpinner.getSelectedItem().equals("Heuristic player")) {
+                playerTypes[1] = PlayerType.HEURISTIC;
+            } else if (player2TypeSpinner.getSelectedItem().equals("Minmax player")) {
+                playerTypes[1] = PlayerType.MINMAX;
+            }
+        } else {
+            for (int i = 0; i < numPlayers; i++) {
+                playerTypes[i] = PlayerType.NORMAL;
+            }
+        }
+        GameConfig gameConfig = new GameConfig(numRows, numCols, 30, playerTypes);
+        gameConfig.setNumLadders(numLadders);
+        gameConfig.setNumSnakes(numSnakes);
+        gameConfig.setNumApples(numApples);
+
         Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra(NUM_ROWS_KEY, numRows);
-        intent.putExtra(NUM_COLS_KEY, numCols);
-        intent.putExtra(NUM_PLAYERS_KEY, numPlayers);
-        intent.putExtra(NUM_LADDERS_KEY, numLadders);
-        intent.putExtra(NUM_SNAKES_KEY, numSnakes);
-        intent.putExtra(NUM_APPLES_KEY, numApples);
+        intent.putExtra(GAME_CONFIG_KEY, gameConfig);
         startActivity(intent);
     }
 }

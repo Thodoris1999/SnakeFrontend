@@ -8,6 +8,7 @@ import android.graphics.Rect;
 import android.support.v7.app.WindowDecorActionBar;
 
 import main.Board;
+import main.Game;
 import timber.log.Timber;
 
 public class SnakeBoard extends BaseSprite {
@@ -16,6 +17,7 @@ public class SnakeBoard extends BaseSprite {
 
     private Tile[][] tileBoard;
     private Apple[] apples;
+    private Ladder[] ladders;
 
     public SnakeBoard(int rows, int columns, int width, int height, int marginLeft, int marginTop) {
         tileBoard = new Tile[rows][columns];
@@ -49,6 +51,14 @@ public class SnakeBoard extends BaseSprite {
             main.Apple apple = board.getApples()[i];
             apples[i] = new Apple(context, getTileById(apple.getAppleTileId()).getRect(), apple.getPoints());
         }
+
+        ladders = new Ladder[board.getLadders().length];
+        for (int i = 0; i < board.getLadders().length; i++) {
+            main.Ladder ladder = board.getLadders()[i];
+            Rect lowStep = getTileById(ladder.getDownstepId()).getRect();
+            Rect highStep = getTileById(ladder.getUpstepId()).getRect();
+            ladders[i] = new Ladder(context, lowStep, highStep);
+        }
     }
 
     public Tile getTile(int x, int y) {
@@ -65,12 +75,20 @@ public class SnakeBoard extends BaseSprite {
         for (Apple apple : apples) {
             apple.draw(canvas);
         }
+        for (Ladder ladder : ladders) {
+            ladder.draw(canvas);
+        }
     }
 
     public void updateBoard(Board board) {
         for (int i = 0; i < board.getApples().length; i++) {
             main.Apple apple = board.getApples()[i];
             apples[i].update(apple.getPoints());
+        }
+
+        for (int i = 0; i < board.getLadders().length; i++) {
+            main.Ladder ladder = board.getLadders()[i];
+            ladders[i].update(ladder.isBroken());
         }
     }
 
