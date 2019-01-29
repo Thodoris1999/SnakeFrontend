@@ -5,11 +5,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.support.v7.app.WindowDecorActionBar;
 
 import main.Board;
-import main.Game;
-import timber.log.Timber;
 
 public class SnakeBoard extends BaseSprite {
 
@@ -18,6 +15,7 @@ public class SnakeBoard extends BaseSprite {
     private Tile[][] tileBoard;
     private Apple[] apples;
     private Ladder[] ladders;
+    private Snake[] snakes;
 
     public SnakeBoard(int rows, int columns, int width, int height, int marginLeft, int marginTop) {
         tileBoard = new Tile[rows][columns];
@@ -59,6 +57,14 @@ public class SnakeBoard extends BaseSprite {
             Rect highStep = getTileById(ladder.getUpstepId()).getRect();
             ladders[i] = new Ladder(context, lowStep, highStep);
         }
+
+        snakes = new Snake[board.getSnakes().length];
+        for (int i = 0; i < board.getSnakes().length; i++) {
+            main.Snake snake = board.getSnakes()[i];
+            Rect tail = getTileById(snake.getTailId()).getRect();
+            Rect head = getTileById(snake.getHeadId()).getRect();
+            snakes[i] = new Snake(context, tail, head);
+        }
     }
 
     public Tile getTile(int x, int y) {
@@ -77,6 +83,9 @@ public class SnakeBoard extends BaseSprite {
         }
         for (Ladder ladder : ladders) {
             ladder.draw(canvas);
+        }
+        for (Snake snake : snakes) {
+            snake.draw(canvas);
         }
     }
 

@@ -23,10 +23,8 @@ public class Ladder extends BaseSprite {
         double ladderWidth = (int) ((lowStep.right - lowStep.left) * 0.5);
         double ladderRotation = 0;
         if (lowStep.left - highStep.left != 0) {
-            Timber.d("tangent: " + (highStep.left - lowStep.left) / (double) (lowStep.top - highStep.top));
             ladderRotation += Math.atan((highStep.left - lowStep.left) / (double) (lowStep.top - highStep.top));
         }
-        Timber.d("rotation angle: " + Math.toDegrees(ladderRotation));
 
         Bitmap sourceLadder = BitmapFactory.decodeResource(context.getResources(), R.drawable.medium_ladder);
         Matrix matrix = new Matrix();
@@ -35,22 +33,18 @@ public class Ladder extends BaseSprite {
         ladderBitmap = Bitmap.createBitmap(scaledLadder, 0, 0, scaledLadder.getWidth(),
                 scaledLadder.getHeight(), matrix, true);
 
-
+        int horizontalOffset = (int) ((highStep.right - highStep.left - ladderWidth * Math.cos(ladderRotation)) / 2);
+        int verticalOffset = (int) ((highStep.bottom - highStep.top - ladderWidth * Math.sin(ladderRotation)) / 2);
         if (ladderRotation >=0) {
-            int horizontalOffset = (int) ((highStep.right - highStep.left - ladderWidth * Math.cos(ladderRotation)) / 2);
-            int verticalOffset = (int) ((highStep.bottom - highStep.top - ladderWidth * Math.sin(ladderRotation)) / 2);
-
             bitmapPosition = new Rect(highStep.left - (int) (ladderHeight * Math.sin(ladderRotation)) + horizontalOffset,
                     highStep.top + verticalOffset,
                     highStep.left - (int) (ladderHeight * Math.sin(ladderRotation)) + horizontalOffset + ladderBitmap.getWidth(),
                     highStep.top + verticalOffset + ladderBitmap.getHeight());
         } else {
-            int horizontalOffset = (int) ((highStep.right + highStep.left - ladderWidth * Math.cos(ladderRotation)) / 2);
-            int verticalOffset = (int) ((highStep.bottom + highStep.top - ladderWidth * Math.sin(ladderRotation)) / 2);
-
-            bitmapPosition = new Rect(highStep.left, highStep.top + (int) (ladderWidth * Math.sin(ladderRotation)),
-                    highStep.left + ladderBitmap.getWidth(),
-                    highStep.top + (int) (ladderWidth * Math.sin(ladderRotation)) + ladderBitmap.getHeight());
+            bitmapPosition = new Rect(highStep.left + horizontalOffset,
+                    highStep.top + (int) (ladderWidth * Math.sin(ladderRotation)) + verticalOffset,
+                    highStep.left + ladderBitmap.getWidth() + horizontalOffset,
+                    highStep.top + (int) (ladderWidth * Math.sin(ladderRotation)) + ladderBitmap.getHeight() + verticalOffset);
         }
     }
 

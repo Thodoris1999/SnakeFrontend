@@ -43,7 +43,7 @@ public class GameOverScreen extends BaseSprite {
         textYpos = y + TEXT_MARGIN_TOP;
 
         int buttonIconSize = (int) AndroidUtils.convertDpToPixel(24);
-        int buttonSize = (int) AndroidUtils.convertDpToPixel(30);
+        int buttonSize = (int) AndroidUtils.convertDpToPixel(36);
 
         buttonPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         buttonPaint.setColor(Color.GRAY);
