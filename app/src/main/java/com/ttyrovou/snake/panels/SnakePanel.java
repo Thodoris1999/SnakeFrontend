@@ -1,7 +1,7 @@
 package com.ttyrovou.snake.panels;
 
+import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -10,11 +10,12 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import com.ttyrovou.snake.MainMenuActivity;
+import com.ttyrovou.snake.AndroidUtils;
 import com.ttyrovou.snake.MainThread;
 import com.ttyrovou.snake.sprites.Background;
 import com.ttyrovou.snake.sprites.GameOverScreen;
 import com.ttyrovou.snake.sprites.PlayerSprite;
+import com.ttyrovou.snake.sprites.ScreenText;
 import com.ttyrovou.snake.sprites.SnakeBoard;
 
 import main.Game;
@@ -30,10 +31,13 @@ public class SnakePanel extends SurfaceView implements SurfaceHolder.Callback, P
     private SnakeBoard snakeBoard;
     private PlayerSprite[] playerSprites;
     private Game game;
+    private ScreenText round, player1Name, player2Name, player1Apples, player2Apples, player1Score, player2Score;
     private GameOverScreen gameOverScreen;
     private boolean gameOver = false;
     private boolean uienabled = true;
     private GameConfig currentGameConfig;
+
+    private static final int TEXT_MARGIN = (int) AndroidUtils.convertDpToPixel(16);
 
     public SnakePanel(Context context, GameConfig config) throws IllegalArgumentException {
         super(context);
@@ -63,6 +67,14 @@ public class SnakePanel extends SurfaceView implements SurfaceHolder.Callback, P
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
         background.draw(canvas);
         snakeBoard.draw(canvas);
+        if (playerSprites.length == 2) {
+            player1Name.draw(canvas);
+            player1Apples.draw(canvas);
+            player1Score.draw(canvas);
+            player2Name.draw(canvas);
+            player2Apples.draw(canvas);
+            player2Score.draw(canvas);
+        }
         for (PlayerSprite playerSprite : playerSprites) {
             playerSprite.draw(canvas);
         }
@@ -87,6 +99,27 @@ public class SnakePanel extends SurfaceView implements SurfaceHolder.Callback, P
         playerSprites = new PlayerSprite[game.getGamePlayers().size()];
         for (int i = 0; i < game.getGamePlayers().size(); i++) {
             playerSprites[i] = new PlayerSprite(snakeBoard.getTileById(game.getPlayerPositions().get(i)).getRect(), Color.BLACK, this);
+        }
+
+        if (game.getGamePlayers().size() == 2) {
+            player1Name = new ScreenText(game.getGamePlayers().get(0).getName(), TEXT_MARGIN, (int) (getHeight() * 0.7),
+            (int) (getWidth() * 0.3), 20);
+            player1Apples = new ScreenText("Apple score: " + game.getGamePlayers().get(0).getScore(),
+                    TEXT_MARGIN, (int) (getHeight() * 0.7) + player1Name.getHeight(), (int) (getWidth() * 0.3),
+                    16);
+            player1Score = new ScreenText("Total score: ",
+                    TEXT_MARGIN, (int) (getHeight() * 0.7) + player1Name.getHeight() + player1Apples.getHeight(),
+                    (int) (getWidth() * 0.3), 16);
+
+            player2Name = new ScreenText(game.getGamePlayers().get(1).getName(), TEXT_MARGIN + (int) (getWidth() * 0.6),
+                    (int) (getHeight() * 0.7),
+                    (int) (getWidth() * 0.3), 20);
+            player2Apples = new ScreenText("Apple score: " + game.getGamePlayers().get(1).getScore(),
+                    TEXT_MARGIN + (int) (getWidth() * 0.6), (int) (getHeight() * 0.7) + player2Name.getHeight(),
+                    (int) (getWidth() * 0.3), 16);
+            player2Score = new ScreenText("Total score: ",
+                    TEXT_MARGIN + (int) (getWidth() * 0.6), (int) (getHeight() * 0.7) +
+                    player2Name.getHeight() + player2Apples.getHeight(), (int) (getWidth() * 0.3), 16);
         }
     }
 
@@ -119,7 +152,7 @@ public class SnakePanel extends SurfaceView implements SurfaceHolder.Callback, P
                 initGraphics();
                 gameOver = false;
             } else if (gameOverScreen.isMainMenuClicked(event.getX(), event.getY())) {
-                context.startActivity(new Intent(context, MainMenuActivity.class));
+                ((Activity) context).finish();
             }
         }
         return super.onTouchEvent(event);
@@ -166,6 +199,10 @@ public class SnakePanel extends SurfaceView implements SurfaceHolder.Callback, P
     public void onAnimationCompleted() {
         uienabled = true;
         snakeBoard.updateBoard(game.getBoard());
+        if (game.getGamePlayers().size() == 2) {
+            player1Apples.setText("Apple score: " + game.getGamePlayers().get(0).getScore());
+            player2Apples.setText("Apple score: " + game.getGamePlayers().get(1).getScore());
+        }
         if (game.isGameOver()) {
             int maxScoreIndex = 0;
             for (int i = 0; i < game.getGamePlayers().size(); i++) {
