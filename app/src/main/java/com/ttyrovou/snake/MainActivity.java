@@ -1,15 +1,15 @@
 package com.ttyrovou.snake;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.ttyrovou.snake.panels.SnakePanel;
 
 import main.GameConfig;
-import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,6 +23,11 @@ public class MainActivity extends AppCompatActivity {
 
         GameConfig gameConfig = (GameConfig) callingIntent.getSerializableExtra(MainMenuActivity.GAME_CONFIG_KEY);
 
-        setContentView(new SnakePanel(this, gameConfig));
+        try {
+            setContentView(new SnakePanel(this, gameConfig));
+        } catch (IllegalArgumentException iae) {
+            Toast.makeText(this, "Could not created game with given values", Toast.LENGTH_LONG).show();
+            finish();
+        }
     }
 }

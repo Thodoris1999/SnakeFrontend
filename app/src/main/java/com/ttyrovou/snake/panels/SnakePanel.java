@@ -35,12 +35,16 @@ public class SnakePanel extends SurfaceView implements SurfaceHolder.Callback, P
     private boolean uienabled = true;
     private GameConfig currentGameConfig;
 
-    public SnakePanel(Context context, GameConfig config) {
+    public SnakePanel(Context context, GameConfig config) throws IllegalArgumentException {
         super(context);
 
         this.context = context;
         this.currentGameConfig = config;
-        game = new Game(config, this);
+        try {
+            game = new Game(config, this);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid arguements");
+        }
 
         getHolder().addCallback(this);
         setFocusable(true);
