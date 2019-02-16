@@ -23,7 +23,7 @@ public class Snake extends BaseSprite {
             snakeRotation += Math.atan((head.left - tail.left) / (double) (tail.top - head.top));
         }
 
-        Bitmap sourceSnake = BitmapFactory.decodeResource(context.getResources(), R.drawable.snake);
+        Bitmap sourceSnake = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_snake);
         Matrix matrix = new Matrix();
         matrix.postRotate((float) Math.toDegrees(snakeRotation));
         Bitmap scaledSnake = Bitmap.createScaledBitmap(sourceSnake, (int) snakeWidth, (int) snakeHeight, true);
