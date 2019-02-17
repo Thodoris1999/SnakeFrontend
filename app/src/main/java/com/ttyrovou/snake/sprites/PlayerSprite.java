@@ -29,9 +29,9 @@ public class PlayerSprite extends BaseSprite {
 
     public PlayerSprite(Rect rect, int color, OnAnimationCompletedListener completedListener) {
         this.radius = (rect.right - rect.left) / 2;
-        this.x = rect.left + radius;
-        this.y = rect.top + (rect.bottom - rect.top) / 2;
         radius *= 0.8;
+        this.x = (rect.right - rect.left) / 2;
+        this.y = rect.top + (rect.bottom - rect.top) / 2;
         this.p = new Paint();
         p.setColor(color);
         this.animationCompletedListener = completedListener;
@@ -71,7 +71,8 @@ public class PlayerSprite extends BaseSprite {
     public void startAnimation(Rect destination) {
         animationQueue.add(destination);
         if (animationRemainingFrames == 0) {
-            startAnimation(destination.left + radius, destination.top + (destination.bottom - destination.top) / 2);
+            startAnimation(destination.left + (destination.right - destination.left) / 2,
+                    destination.top + (destination.bottom - destination.top) / 2);
         }
     }
 
@@ -81,15 +82,17 @@ public class PlayerSprite extends BaseSprite {
             Rect destination = animationQueue.getFirst();
             if (destination == null) {
                 animationQueue.removeFirst();
-                animationCompletedListener.onAnimationCompleted();
+                animationCompletedListener.onFullAnimationCompleted();
             } else {
-                startAnimation(destination.left + radius, destination.top + (destination.bottom - destination.top) / 2);
+                startAnimation(destination.left + (destination.right - destination.left) / 2, destination.top + (destination.bottom - destination.top) / 2);
             }
         }
     }
 
     public interface OnAnimationCompletedListener {
-        void onAnimationCompleted();
+        void onSmallAnimationCompleted();
+        void onIntermediateAnimationCompleted();
+        void onFullAnimationCompleted();
     }
 
     public void setX(float x) {

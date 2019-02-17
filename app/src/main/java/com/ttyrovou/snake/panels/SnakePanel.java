@@ -67,6 +67,7 @@ public class SnakePanel extends SurfaceView implements SurfaceHolder.Callback, P
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
         background.draw(canvas);
         snakeBoard.draw(canvas);
+        round.draw(canvas);
         if (playerSprites.length == 2) {
             player1Name.draw(canvas);
             player1Apples.draw(canvas);
@@ -101,25 +102,28 @@ public class SnakePanel extends SurfaceView implements SurfaceHolder.Callback, P
             playerSprites[i] = new PlayerSprite(snakeBoard.getTileById(game.getPlayerPositions().get(i)).getRect(), Color.BLACK, this);
         }
 
+        round = new ScreenText("Round: " + game.getRound(), 0, (int) (getHeight() * 0.8), getWidth(), 18);
+        // center text
+        round.setX((int) (getWidth() / 2 - round.getMeasuredWidth() / 2));
         if (game.getGamePlayers().size() == 2) {
             player1Name = new ScreenText(game.getGamePlayers().get(0).getName(), TEXT_MARGIN, (int) (getHeight() * 0.7),
             (int) (getWidth() * 0.3), 20);
             player1Apples = new ScreenText("Apple score: " + game.getGamePlayers().get(0).getScore(),
-                    TEXT_MARGIN, (int) (getHeight() * 0.7) + player1Name.getHeight(), (int) (getWidth() * 0.3),
-                    16);
+                    TEXT_MARGIN, (int) (getHeight() * 0.7) + player1Name.getHeight(), (int) (getWidth() * 0.35),
+                    14);
             player1Score = new ScreenText("Total score: ",
                     TEXT_MARGIN, (int) (getHeight() * 0.7) + player1Name.getHeight() + player1Apples.getHeight(),
-                    (int) (getWidth() * 0.3), 16);
+                    (int) (getWidth() * 0.35), 14);
 
             player2Name = new ScreenText(game.getGamePlayers().get(1).getName(), TEXT_MARGIN + (int) (getWidth() * 0.6),
                     (int) (getHeight() * 0.7),
                     (int) (getWidth() * 0.3), 20);
             player2Apples = new ScreenText("Apple score: " + game.getGamePlayers().get(1).getScore(),
                     TEXT_MARGIN + (int) (getWidth() * 0.6), (int) (getHeight() * 0.7) + player2Name.getHeight(),
-                    (int) (getWidth() * 0.3), 16);
+                    (int) (getWidth() * 0.35), 14);
             player2Score = new ScreenText("Total score: ",
                     TEXT_MARGIN + (int) (getWidth() * 0.6), (int) (getHeight() * 0.7) +
-                    player2Name.getHeight() + player2Apples.getHeight(), (int) (getWidth() * 0.3), 16);
+                    player2Name.getHeight() + player2Apples.getHeight(), (int) (getWidth() * 0.35), 14);
         }
     }
 
@@ -196,9 +200,20 @@ public class SnakePanel extends SurfaceView implements SurfaceHolder.Callback, P
     }
 
     @Override
-    public void onAnimationCompleted() {
+    public void onSmallAnimationCompleted() {
+
+    }
+
+    @Override
+    public void onIntermediateAnimationCompleted() {
+
+    }
+
+    @Override
+    public void onFullAnimationCompleted() {
         uienabled = true;
         snakeBoard.updateBoard(game.getBoard());
+        round.setText("Round: " + game.getRound());
         if (game.getGamePlayers().size() == 2) {
             player1Apples.setText("Apple score: " + game.getGamePlayers().get(0).getScore());
             player2Apples.setText("Apple score: " + game.getGamePlayers().get(1).getScore());
