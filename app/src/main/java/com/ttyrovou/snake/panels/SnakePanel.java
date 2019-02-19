@@ -11,6 +11,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import com.ttyrovou.snake.AndroidUtils;
+import com.ttyrovou.snake.Animation;
 import com.ttyrovou.snake.MainThread;
 import com.ttyrovou.snake.sprites.Background;
 import com.ttyrovou.snake.sprites.GameOverScreen;
@@ -18,9 +19,12 @@ import com.ttyrovou.snake.sprites.PlayerSprite;
 import com.ttyrovou.snake.sprites.ScreenText;
 import com.ttyrovou.snake.sprites.SnakeBoard;
 
+import java.text.DecimalFormat;
+
 import main.Game;
 import main.GameConfig;
 import main.Player;
+import main.PlayerState;
 import timber.log.Timber;
 
 public class SnakePanel extends SurfaceView implements SurfaceHolder.Callback, Player.MoveUpdateListener, PlayerSprite.OnAnimationCompletedListener {
@@ -106,24 +110,33 @@ public class SnakePanel extends SurfaceView implements SurfaceHolder.Callback, P
         // center text
         round.setX((int) (getWidth() / 2 - round.getMeasuredWidth() / 2));
         if (game.getGamePlayers().size() == 2) {
-            player1Name = new ScreenText(game.getGamePlayers().get(0).getName(), TEXT_MARGIN, (int) (getHeight() * 0.7),
-            (int) (getWidth() * 0.3), 20);
+            // align player info to the bottom of the screen
+            player1Score = new ScreenText("Total score: " +
+                    Player.evaluate(game.getPlayerPositions().get(0), game.getGamePlayers().get(0).getScore()),
+                    TEXT_MARGIN, 0,
+                    (int) (getWidth() * 0.35), 14);
+            player1Score.setY(getHeight() - player1Score.getHeight() - TEXT_MARGIN);
             player1Apples = new ScreenText("Apple score: " + game.getGamePlayers().get(0).getScore(),
-                    TEXT_MARGIN, (int) (getHeight() * 0.7) + player1Name.getHeight(), (int) (getWidth() * 0.35),
+                    TEXT_MARGIN, 0, (int) (getWidth() * 0.35),
                     14);
-            player1Score = new ScreenText("Total score: ",
-                    TEXT_MARGIN, (int) (getHeight() * 0.7) + player1Name.getHeight() + player1Apples.getHeight(),
-                    (int) (getWidth() * 0.35), 14);
-
-            player2Name = new ScreenText(game.getGamePlayers().get(1).getName(), TEXT_MARGIN + (int) (getWidth() * 0.6),
-                    (int) (getHeight() * 0.7),
+            player1Apples.setY(getHeight() - player1Score.getHeight() - player1Apples.getHeight() - TEXT_MARGIN);
+            player1Name = new ScreenText(game.getGamePlayers().get(0).getName(), TEXT_MARGIN, 0,
                     (int) (getWidth() * 0.3), 20);
+            player1Name.setY(getHeight() - player1Score.getHeight() - player1Apples.getHeight()
+                    - player1Name.getHeight() - TEXT_MARGIN);
+
+            player2Score = new ScreenText("Total score: " +
+                    Player.evaluate(game.getPlayerPositions().get(0), game.getGamePlayers().get(0).getScore()),
+                    TEXT_MARGIN + (int) (getWidth() * 0.6), 0, (int) (getWidth() * 0.35), 14);
+            player2Score.setY(getHeight() - player2Score.getHeight() - TEXT_MARGIN);
             player2Apples = new ScreenText("Apple score: " + game.getGamePlayers().get(1).getScore(),
-                    TEXT_MARGIN + (int) (getWidth() * 0.6), (int) (getHeight() * 0.7) + player2Name.getHeight(),
+                    TEXT_MARGIN + (int) (getWidth() * 0.6), 0,
                     (int) (getWidth() * 0.35), 14);
-            player2Score = new ScreenText("Total score: ",
-                    TEXT_MARGIN + (int) (getWidth() * 0.6), (int) (getHeight() * 0.7) +
-                    player2Name.getHeight() + player2Apples.getHeight(), (int) (getWidth() * 0.35), 14);
+            player2Apples.setY(getHeight() - player2Score.getHeight() - player2Apples.getHeight() - TEXT_MARGIN);
+            player2Name = new ScreenText(game.getGamePlayers().get(1).getName(), TEXT_MARGIN + (int) (getWidth() * 0.6),
+                    0, (int) (getWidth() * 0.3), 20);
+            player2Name.setY(getHeight() - player2Score.getHeight() - player2Apples.getHeight()
+                    - player2Name.getHeight() - TEXT_MARGIN);
         }
     }
 
@@ -163,61 +176,85 @@ public class SnakePanel extends SurfaceView implements SurfaceHolder.Callback, P
     }
 
     @Override
-    public void onMoveEvent(Player player, int oldPos, int newPos, Player.MoveEvent moveEvent) {
-        int playerIndex = game.findPlayerIndexById(player.getPlayerId());
+    public void onMoveEvent(PlayerState playerState, int oldPos, Player.MoveEvent moveEvent) {
+        int playerIndex = game.findPlayerIndexById(playerState.getPlayerId());
         PlayerSprite movedPlayerSprite = playerSprites[playerIndex];
         switch (moveEvent) {
             case MOVE_DUE_TO_DIE_THROW: {
                 uienabled = false;
-                for (int i = oldPos + 1; i < newPos + 1; i++) {
-                    Rect destination = snakeBoard.getTileById(i).getRect();
-                    movedPlayerSprite.startAnimation(destination);
-                }
+                Rect destination = snakeBoard.getTileById(playerState.getPosition()).getRect();
+                movedPlayerSprite.addAnimation(new Animation(destination, Animation.WALK, playerState));
                 break;
             }
             case MOVE_DUE_TO_LADDER: {
                 uienabled = false;
-                Rect destination = snakeBoard.getTileById(newPos).getRect();
-                movedPlayerSprite.startAnimation(destination);
+                Rect destination = snakeBoard.getTileById(playerState.getPosition()).getRect();
+                movedPlayerSprite.addAnimation(new Animation(destination, Animation.LADDER_OR_SNAKE, playerState));
                 break;
             }
             case MOVE_DUE_TO_SNAKE: {
                 uienabled = false;
-                Rect destination = snakeBoard.getTileById(newPos).getRect();
-                movedPlayerSprite.startAnimation(destination);
+                Rect destination = snakeBoard.getTileById(playerState.getPosition()).getRect();
+                movedPlayerSprite.addAnimation(new Animation(destination, Animation.LADDER_OR_SNAKE, playerState));
                 break;
             }
             case TURN_COMPLETED: {
                 // indicates the end of a turn
-                movedPlayerSprite.startAnimation(null);
+                break;
             }
         }
     }
 
     @Override
-    public void onAppleConsumption(int points) {
+    public void onAppleConsumption(PlayerState playerState) {
+        int playerIndex = game.findPlayerIndexById(playerState.getPlayerId());
+        PlayerSprite movedPlayerSprite = playerSprites[playerIndex];
+        movedPlayerSprite.getAnimationQueue().getLast().setPlayerState(playerState);
+    }
 
+
+    @Override
+    public void onWalkAnimationCompleted(PlayerState playerState) {
+        Timber.d(String.valueOf(Player.evaluate(playerState.getPosition(),
+                playerState.getPoints())));
+        if (game.getGamePlayers().size() == 2) {
+            DecimalFormat formatter = new DecimalFormat("#.#");
+            int playerIndex = game.findPlayerIndexById(playerState.getPlayerId());
+            if (playerIndex == 0) {
+                player1Apples.setText("Apple score: " + playerState.getPoints());
+                player1Score.setText("Total score: " + formatter.format(Player.evaluate(playerState.getPosition(),
+                        playerState.getPoints())));
+            } else {
+                player2Apples.setText("Apple score: " + playerState.getPoints());
+                player2Score.setText("Total score: " + formatter.format(Player.evaluate(playerState.getPosition(),
+                        playerState.getPoints())));
+            }
+        }
     }
 
     @Override
-    public void onSmallAnimationCompleted() {
-
-    }
-
-    @Override
-    public void onIntermediateAnimationCompleted() {
-
+    public void onIntermediateAnimationCompleted(PlayerState playerState) {
+        Timber.d("Board updated");
+        snakeBoard.updateBoard(playerState.getBoard());
+        if (game.getGamePlayers().size() == 2) {
+            DecimalFormat formatter = new DecimalFormat("#.#");
+            int playerIndex = game.findPlayerIndexById(playerState.getPlayerId());
+            if (playerIndex == 0) {
+                player1Apples.setText("Apple score: " + playerState.getPoints());
+                player1Score.setText("Total score: " + formatter.format(Player.evaluate(playerState.getPosition(),
+                        playerState.getPoints())));
+            } else {
+                player2Apples.setText("Apple score: " + playerState.getPoints());
+                player2Score.setText("Total score: " + formatter.format(Player.evaluate(playerState.getPosition(),
+                        playerState.getPoints())));
+            }
+        }
     }
 
     @Override
     public void onFullAnimationCompleted() {
         uienabled = true;
-        snakeBoard.updateBoard(game.getBoard());
         round.setText("Round: " + game.getRound());
-        if (game.getGamePlayers().size() == 2) {
-            player1Apples.setText("Apple score: " + game.getGamePlayers().get(0).getScore());
-            player2Apples.setText("Apple score: " + game.getGamePlayers().get(1).getScore());
-        }
         if (game.isGameOver()) {
             int maxScoreIndex = 0;
             for (int i = 0; i < game.getGamePlayers().size(); i++) {

@@ -4,7 +4,12 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
+import com.ttyrovou.snake.Animation;
+
 import java.util.LinkedList;
+
+import main.PlayerState;
+import timber.log.Timber;
 
 public class PlayerSprite extends BaseSprite {
 
@@ -15,7 +20,7 @@ public class PlayerSprite extends BaseSprite {
 
     private int animationRemainingFrames = 0;
     private float animationStartX, animationStartY, animationEndX, animationEndY;
-    private LinkedList<Rect> animationQueue = new LinkedList<>();
+    private LinkedList<Animation> animationQueue = new LinkedList<>();
 
     private OnAnimationCompletedListener animationCompletedListener;
 
@@ -56,58 +61,57 @@ public class PlayerSprite extends BaseSprite {
     }
 
     // http://cogitolearning.co.uk/2013/10/android-animations-tutorial-5-more-on-interpolators/
-    public float accelerateDecelerateInterpolator(float time) {
+    private float accelerateDecelerateInterpolator(float time) {
         return (float) (Math.cos((time + 1) * Math.PI) / 2 + 0.5);
     }
 
-    public void startAnimation(float xend, float yend) {
+    private void consumeAnimation(float xend, float yend, int duration) {
         animationStartX = x;
         animationStartY = y;
         animationEndX = xend;
         animationEndY = yend;
-        animationRemainingFrames = ANIMATION_DURATION;
+        animationRemainingFrames = duration;
     }
 
-    public void startAnimation(Rect destination) {
-        animationQueue.add(destination);
+    private void consumeAnimation() {
+        Animation animation = animationQueue.getFirst();
+        consumeAnimation(animation.getDestination().left +
+                        (animation.getDestination().right - animation.getDestination().left) / 2,
+                animation.getDestination().top +
+                        (animation.getDestination().bottom - animation.getDestination().top) / 2,
+                animation.getDuration());
+    }
+
+    public void addAnimation(Animation animation) {
+        animationQueue.add(animation);
         if (animationRemainingFrames == 0) {
-            startAnimation(destination.left + (destination.right - destination.left) / 2,
-                    destination.top + (destination.bottom - destination.top) / 2);
+            consumeAnimation();
         }
     }
 
     public void onSmallAnimationFished() {
+        if (animationQueue.getFirst().getType() == Animation.LADDER_OR_SNAKE ||
+                (animationQueue.size() > 1 && animationQueue.getFirst().getType() == Animation.WALK && animationQueue.get(1).getType() != Animation.WALK)) {
+            animationCompletedListener.onIntermediateAnimationCompleted(animationQueue.getFirst().getPlayerState());
+        } else if (animationQueue.size() > 1 && animationQueue.getFirst().getType() == Animation.WALK &&
+                animationQueue.get(1).getType() == Animation.WALK) {
+            animationCompletedListener.onWalkAnimationCompleted(animationQueue.getFirst().getPlayerState());
+        }
         animationQueue.removeFirst();
-        if (!animationQueue.isEmpty()) {
-            Rect destination = animationQueue.getFirst();
-            if (destination == null) {
-                animationQueue.removeFirst();
-                animationCompletedListener.onFullAnimationCompleted();
-            } else {
-                startAnimation(destination.left + (destination.right - destination.left) / 2, destination.top + (destination.bottom - destination.top) / 2);
-            }
+        if (animationQueue.isEmpty())
+            animationCompletedListener.onFullAnimationCompleted();
+        else {
+            consumeAnimation();
         }
     }
 
     public interface OnAnimationCompletedListener {
-        void onSmallAnimationCompleted();
-        void onIntermediateAnimationCompleted();
+        void onWalkAnimationCompleted(PlayerState playerState);
+        void onIntermediateAnimationCompleted(PlayerState playerState);
         void onFullAnimationCompleted();
     }
 
-    public void setX(float x) {
-        this.x = x;
-    }
-
-    public float getX() {
-        return x;
-    }
-
-    public void setY(float y) {
-        this.y = y;
-    }
-
-    public float getY() {
-        return y;
+    public LinkedList<Animation> getAnimationQueue() {
+        return animationQueue;
     }
 }

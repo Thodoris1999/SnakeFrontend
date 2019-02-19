@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 
 import main.Board;
+import main.PlayerState;
 
 public class SnakeBoard extends BaseSprite {
 
