@@ -24,10 +24,11 @@ public class SnakeBoard extends BaseSprite {
         int tileHeight = height / rows;
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
+                int id = columns * rows - columns - columns * i + (((rows - 1 - i) % 2 == 0) ? (j + 1) : (columns - j));
                 // alternate between a set of colors
                 int colorIndex = (i - j + columns - 1) % tileColors.length;
                 tileBoard[i][j] = new Tile(marginLeft + j * tileWidth, marginTop + i * tileHeight,
-                        tileWidth, tileHeight, tileColors[colorIndex]);
+                        tileWidth, tileHeight, tileColors[colorIndex], id);
             }
         }
     }
@@ -38,10 +39,11 @@ public class SnakeBoard extends BaseSprite {
         int tileHeight = height / board.getM();
         for (int i = 0; i < board.getM(); i++) {
             for (int j = 0; j < board.getN(); j++) {
+                int id = board.getN() * board.getM() - board.getN() - board.getN() * i + (((board.getM() - 1 - i) % 2 == 0) ? (j + 1) : (board.getN() - j));
                 // alternate between a set of colors
                 int colorIndex = (i - j + board.getN() - 1) % tileColors.length;
                 tileBoard[i][j] = new Tile(j * tileWidth, i * tileHeight,
-                        tileWidth, tileHeight, tileColors[colorIndex]);
+                        tileWidth, tileHeight, tileColors[colorIndex], id);
             }
         }
 
@@ -119,11 +121,14 @@ public class SnakeBoard extends BaseSprite {
 
         private Rect rect;
         private Paint paint;
+        private ScreenText tileId;
 
-        public Tile(int x, int y, int width, int height, int color) {
+        public Tile(int x, int y, int width, int height, int color, int id) {
             rect = new Rect(x, y, x + width, y + height);
             paint = new Paint();
             paint.setColor(color);
+
+            tileId = new ScreenText(Integer.toString(id), x, y, width, 8, 255, 0, 0, 0);
         }
 
         public Tile(Rect rect, int color) {
@@ -139,6 +144,7 @@ public class SnakeBoard extends BaseSprite {
         @Override
         public void draw(Canvas canvas) {
             canvas.drawRect(rect, paint);
+            tileId.draw(canvas);
         }
     }
 }

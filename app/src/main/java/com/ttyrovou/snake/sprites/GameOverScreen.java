@@ -30,7 +30,7 @@ public class GameOverScreen extends BaseSprite {
         int textXpos = x + TEXT_MARGIN_LEFT;
         int textYpos = y + TEXT_MARGIN_TOP;
         winnerText = new ScreenText(text, textXpos, textYpos, width - 2 * TEXT_MARGIN_LEFT,
-                24);
+                24, 255, 0, 0, 0);
 
         int buttonIconSize = (int) AndroidUtils.convertDpToPixel(36);
         int buttonSize = (int) AndroidUtils.convertDpToPixel(48);

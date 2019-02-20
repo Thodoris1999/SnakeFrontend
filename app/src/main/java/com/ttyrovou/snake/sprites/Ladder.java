@@ -35,7 +35,7 @@ public class Ladder extends BaseSprite {
 
         int horizontalOffset = (int) ((highStep.right - highStep.left - ladderWidth * Math.cos(ladderRotation)) / 2);
         int verticalOffset = (int) ((highStep.bottom - highStep.top - ladderWidth * Math.sin(ladderRotation)) / 2);
-        if (ladderRotation >=0) {
+        if (ladderRotation >= 0) {
             bitmapPosition = new Rect(highStep.left - (int) (ladderHeight * Math.sin(ladderRotation)) + horizontalOffset,
                     highStep.top + verticalOffset,
                     highStep.left - (int) (ladderHeight * Math.sin(ladderRotation)) + horizontalOffset + ladderBitmap.getWidth(),

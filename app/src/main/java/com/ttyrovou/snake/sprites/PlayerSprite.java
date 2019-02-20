@@ -4,14 +4,14 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
+import com.ttyrovou.snake.AndroidUtils;
 import com.ttyrovou.snake.Animation;
 
 import java.util.LinkedList;
 
 import main.PlayerState;
-import timber.log.Timber;
 
-public class PlayerSprite extends BaseSprite {
+public class PlayerSprite extends BaseSprite implements Dice.OnDiceFinishedListener {
 
     public static final int ANIMATION_DURATION = 10; // in frames
 
@@ -34,7 +34,7 @@ public class PlayerSprite extends BaseSprite {
 
     public PlayerSprite(Rect rect, int color, OnAnimationCompletedListener completedListener) {
         this.radius = (rect.right - rect.left) / 2;
-        radius *= 0.8;
+        radius = (float) Math.min(radius * 0.8, AndroidUtils.convertDpToPixel(32));
         this.x = (rect.right - rect.left) / 2;
         this.y = rect.top + (rect.bottom - rect.top) / 2;
         this.p = new Paint();
@@ -55,6 +55,10 @@ public class PlayerSprite extends BaseSprite {
         }
     }
 
+    public void setColor(int a, int r, int g, int b) {
+        p.setARGB(a, r, g, b);
+    }
+
     @Override
     public void draw(Canvas canvas) {
         canvas.drawCircle(x, y, radius, p);
@@ -73,7 +77,7 @@ public class PlayerSprite extends BaseSprite {
         animationRemainingFrames = duration;
     }
 
-    private void consumeAnimation() {
+    public void consumeAnimation() {
         Animation animation = animationQueue.getFirst();
         consumeAnimation(animation.getDestination().left +
                         (animation.getDestination().right - animation.getDestination().left) / 2,
@@ -84,16 +88,14 @@ public class PlayerSprite extends BaseSprite {
 
     public void addAnimation(Animation animation) {
         animationQueue.add(animation);
-        if (animationRemainingFrames == 0) {
-            consumeAnimation();
-        }
     }
 
     public void onSmallAnimationFished() {
         if (animationQueue.getFirst().getType() == Animation.LADDER_OR_SNAKE ||
                 (animationQueue.size() > 1 && animationQueue.getFirst().getType() == Animation.WALK && animationQueue.get(1).getType() != Animation.WALK)) {
             animationCompletedListener.onIntermediateAnimationCompleted(animationQueue.getFirst().getPlayerState());
-        } else if (animationQueue.size() > 1 && animationQueue.getFirst().getType() == Animation.WALK &&
+        }
+        if (animationQueue.size() > 1 && animationQueue.getFirst().getType() == Animation.WALK &&
                 animationQueue.get(1).getType() == Animation.WALK) {
             animationCompletedListener.onWalkAnimationCompleted(animationQueue.getFirst().getPlayerState());
         }
@@ -103,6 +105,11 @@ public class PlayerSprite extends BaseSprite {
         else {
             consumeAnimation();
         }
+    }
+
+    @Override
+    public void onDiceFinished() {
+        consumeAnimation();
     }
 
     public interface OnAnimationCompletedListener {

@@ -5,8 +5,6 @@ import android.view.SurfaceHolder;
 
 import com.ttyrovou.snake.panels.SnakePanel;
 
-import timber.log.Timber;
-
 public class MainThread extends Thread {
 
     private final static int MAX_FPS = 25;

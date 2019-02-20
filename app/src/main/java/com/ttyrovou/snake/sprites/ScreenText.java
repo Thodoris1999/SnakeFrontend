@@ -12,13 +12,15 @@ public class ScreenText extends BaseSprite {
     private Layout textLayout;
     private int x, y;
 
-    public ScreenText(CharSequence text, int x, int y, int maxWidth, float textSizeDP) {
+    public ScreenText(CharSequence text, int x, int y, int maxWidth, float textSizeDP, int a, int r,
+                      int g, int b) {
         this.x = x;
         this.y = y;
         TextPaint textPaint = new TextPaint();
         textPaint.setAntiAlias(true);
         textPaint.setTextSize(AndroidUtils.convertDpToPixel(textSizeDP));
         textPaint.setColor(0xFF000000);
+        textPaint.setARGB(a, r, g, b);
 
         textLayout = new StaticLayout(text, textPaint, maxWidth,
                 Layout.Alignment.ALIGN_NORMAL, 1.0f, 0, false);

@@ -7,8 +7,6 @@ import android.graphics.drawable.Drawable;
 
 import com.ttyrovou.snake.R;
 
-import timber.log.Timber;
-
 public class Apple extends BaseSprite {
 
     private Context context;
@@ -43,7 +41,7 @@ public class Apple extends BaseSprite {
             appleSprite.setBounds(x, y, x + width, y + height);
         } else if (points < 0) {
             // TODO: change to black apple
-            appleSprite = context.getResources().getDrawable(R.drawable.ic_apple);
+            appleSprite = context.getResources().getDrawable(R.drawable.ic_apple_black);
             appleSprite.setBounds(x, y, x + width, y + height);
         }
     }
