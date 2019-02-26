@@ -7,6 +7,19 @@ import android.text.TextPaint;
 
 import com.ttyrovou.snake.AndroidUtils;
 
+/**
+ * Draws text on screen
+ *
+ * @author Τυροβούζης Θεόδωρος
+ * AEM 9369
+ * phone number 6955253435
+ * email ttyrovou@ece.auth.gr
+ *
+ * @author Τσιμρόγλου Στυλιανός
+ * AEM 9468
+ * phone number 6977030504
+ * email stsimrog@ece.auth.gr
+ */
 public class ScreenText extends BaseSprite {
 
     private Layout textLayout;
@@ -49,6 +62,10 @@ public class ScreenText extends BaseSprite {
         this.y = y;
     }
 
+    /**
+     * Changes the text being drawn, if it is different than the current
+     * @param text the new text
+     */
     public void setText(CharSequence text) {
         if (!text.equals(textLayout.getText())) {
             textLayout = new StaticLayout(text, textLayout.getPaint(), textLayout.getWidth(),

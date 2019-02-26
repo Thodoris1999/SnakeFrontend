@@ -11,6 +11,19 @@ import com.ttyrovou.snake.R;
 
 import timber.log.Timber;
 
+/**
+ * Draws ladders, if they are not broken
+ *
+ * @author Τυροβούζης Θεόδωρος
+ * AEM 9369
+ * phone number 6955253435
+ * email ttyrovou@ece.auth.gr
+ *
+ * @author Τσιμρόγλου Στυλιανός
+ * AEM 9468
+ * phone number 6977030504
+ * email stsimrog@ece.auth.gr
+ */
 public class Ladder extends BaseSprite {
 
     private Bitmap ladderBitmap;

@@ -28,6 +28,19 @@ import main.Player;
 import main.PlayerState;
 import timber.log.Timber;
 
+/**
+ * The screen that renders the game
+ *
+ * @author Τυροβούζης Θεόδωρος
+ * AEM 9369
+ * phone number 6955253435
+ * email ttyrovou@ece.auth.gr
+ *
+ * @author Τσιμρόγλου Στυλιανός
+ * AEM 9468
+ * phone number 6977030504
+ * email stsimrog@ece.auth.gr
+ */
 public class SnakePanel extends SurfaceView implements SurfaceHolder.Callback, Player.MoveUpdateListener,
         PlayerSprite.OnAnimationCompletedListener {
 
@@ -46,6 +59,9 @@ public class SnakePanel extends SurfaceView implements SurfaceHolder.Callback, P
 
     private static final int TEXT_MARGIN = (int) AndroidUtils.convertDpToPixel(16);
 
+    /**
+     * Initializes game and surface
+     */
     public SnakePanel(Context context, GameConfig config) throws IllegalArgumentException {
         super(context);
 
@@ -62,6 +78,9 @@ public class SnakePanel extends SurfaceView implements SurfaceHolder.Callback, P
         setWillNotDraw(false);
     }
 
+    /**
+     * updates variables that need updating every frame
+     */
     public void update() {
         for (PlayerSprite playerSprite : playerSprites) {
             playerSprite.update();
@@ -70,6 +89,9 @@ public class SnakePanel extends SurfaceView implements SurfaceHolder.Callback, P
         postInvalidate();
     }
 
+    /**
+     * draws graphics on screen
+     */
     @Override
     protected void onDraw(Canvas canvas) {
         //clears canvas
@@ -94,6 +116,9 @@ public class SnakePanel extends SurfaceView implements SurfaceHolder.Callback, P
             gameOverScreen.draw(canvas);
     }
 
+    /**
+     * Gets called when the surface is about to be shown on screen. Initialized graphics and main thread
+     */
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
         initGraphics();
@@ -104,6 +129,10 @@ public class SnakePanel extends SurfaceView implements SurfaceHolder.Callback, P
 
     }
 
+    /**
+     * Configures the graphics that are about to be drawn on screen. If the number of players is 2,
+     * draw also some statistics about the players
+     */
     public void initGraphics() {
         background = new Background(getWidth(), getHeight(), Color.rgb(255, 183, 81));
         if (game.getBoard().getM() == 1) {
@@ -164,6 +193,10 @@ public class SnakePanel extends SurfaceView implements SurfaceHolder.Callback, P
 
     }
 
+    /**
+     * Called when the user navigates away from the surface.
+     * Stops the main thread
+     */
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
         boolean retry = true;
@@ -178,6 +211,10 @@ public class SnakePanel extends SurfaceView implements SurfaceHolder.Callback, P
         }
     }
 
+    /**
+     * Called when a gesture is detected
+     * @param event the type of touch event
+     */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN && uienabled && !gameOver) {
@@ -196,6 +233,12 @@ public class SnakePanel extends SurfaceView implements SurfaceHolder.Callback, P
         return super.onTouchEvent(event);
     }
 
+    /**
+     * Called when a move event is dispatched from the backend during a player's turn
+     * @param playerState info about the player and board at the time of the event
+     * @param oldPos the player's position before the event
+     * @param moveEvent the type of movement event
+     */
     @Override
     public void onMoveEvent(PlayerState playerState, int oldPos, Player.MoveEvent moveEvent) {
         int playerIndex = game.findPlayerIndexById(playerState.getPlayerId());
@@ -237,6 +280,10 @@ public class SnakePanel extends SurfaceView implements SurfaceHolder.Callback, P
         }
     }
 
+    /**
+     * Called when an apple consumption event is dispatched from the backend during a player's turn
+     * @param playerState info about the player and board at the time of the event
+     */
     @Override
     public void onAppleConsumption(PlayerState playerState) {
         int playerIndex = game.findPlayerIndexById(playerState.getPlayerId());
@@ -245,6 +292,10 @@ public class SnakePanel extends SurfaceView implements SurfaceHolder.Callback, P
     }
 
 
+    /**
+     * Called when a {@link PlayerSprite} finishes a walk animation
+     * @param playerState info about the player and board at the time of the movement
+     */
     @Override
     public void onWalkAnimationCompleted(PlayerState playerState) {
         snakeBoard.updateBoard(playerState.getBoard());
@@ -263,6 +314,10 @@ public class SnakePanel extends SurfaceView implements SurfaceHolder.Callback, P
         }
     }
 
+    /**
+     * Called when a {@link PlayerSprite} finished a movement due to either dice roll, snake or ladder
+     * @param playerState info about the player and board at the time of the movement
+     */
     @Override
     public void onIntermediateAnimationCompleted(PlayerState playerState) {
         Timber.d("Board updated");
@@ -282,10 +337,14 @@ public class SnakePanel extends SurfaceView implements SurfaceHolder.Callback, P
         }
     }
 
+    /**
+     * Called when a {@link PlayerSprite} finished all his animations in a turn
+     */
     @Override
     public void onFullAnimationCompleted() {
         uienabled = true;
         round.setText("Round: " + game.getRound());
+        snakeBoard.updateBoard(game.getBoard());
         if (game.isGameOver()) {
             int maxScoreIndex = 0;
             for (int i = 0; i < game.getGamePlayers().size(); i++) {

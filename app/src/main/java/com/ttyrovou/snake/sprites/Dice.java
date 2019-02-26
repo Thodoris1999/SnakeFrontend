@@ -12,6 +12,19 @@ import java.util.ArrayList;
 
 import timber.log.Timber;
 
+/**
+ * Draws a dice. Can also cycle between all its faces for a few frames and then stop at a given face.
+ *
+ * @author Τυροβούζης Θεόδωρος
+ * AEM 9369
+ * phone number 6955253435
+ * email ttyrovou@ece.auth.gr
+ *
+ * @author Τσιμρόγλου Στυλιανός
+ * AEM 9468
+ * phone number 6977030504
+ * email stsimrog@ece.auth.gr
+ */
 public class Dice extends BaseSprite {
 
     private static final int MIN_FRAMES_ROLLING = 3 * 6;
@@ -45,6 +58,11 @@ public class Dice extends BaseSprite {
         }
     }
 
+    /**
+     * Starts animating the dice roll
+     * @param numberToStop the number to get after the roll
+     * @param onDiceFinishedListener dispatcher of the roll-finishing event
+     */
     public void startRolling(int numberToStop, OnDiceFinishedListener onDiceFinishedListener) {
         this.numberToStopAt = numberToStop;
         this.onDiceFinishedListener = onDiceFinishedListener;
@@ -52,13 +70,16 @@ public class Dice extends BaseSprite {
         rolling = true;
     }
 
+    /**
+     * Callback that the dice roll animation has finished to send to the {@link PlayerSprite}
+     * so it can start its animations
+     */
     public interface OnDiceFinishedListener {
         void onDiceFinished();
     }
 
     @Override
     public void draw(Canvas canvas) {
-        Timber.d(Integer.toString(cycle));
         canvas.drawBitmap(bitmaps.get(cycle % 6), null, dicePosition, null);
     }
 }

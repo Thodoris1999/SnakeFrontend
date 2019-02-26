@@ -11,8 +11,24 @@ import com.ttyrovou.snake.panels.SnakePanel;
 
 import main.GameConfig;
 
+/**
+ * The activity where the user plays the game
+ *
+ * @author Τυροβούζης Θεόδωρος
+ * AEM 9369
+ * phone number 6955253435
+ * email ttyrovou@ece.auth.gr
+ *
+ * @author Τσιμρόγλου Στυλιανός
+ * AEM 9468
+ * phone number 6977030504
+ * email stsimrog@ece.auth.gr
+ */
 public class MainActivity extends AppCompatActivity {
 
+    /**
+     * Gets called when the activity is created
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

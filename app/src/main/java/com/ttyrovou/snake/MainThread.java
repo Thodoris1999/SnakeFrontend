@@ -5,6 +5,19 @@ import android.view.SurfaceHolder;
 
 import com.ttyrovou.snake.panels.SnakePanel;
 
+/**
+ * A thread that runs every frame
+ *
+ * @author Τυροβούζης Θεόδωρος
+ * AEM 9369
+ * phone number 6955253435
+ * email ttyrovou@ece.auth.gr
+ *
+ * @author Τσιμρόγλου Στυλιανός
+ * AEM 9468
+ * phone number 6977030504
+ * email stsimrog@ece.auth.gr
+ */
 public class MainThread extends Thread {
 
     private final static int MAX_FPS = 25;
@@ -24,6 +37,10 @@ public class MainThread extends Thread {
         this.running = running;
     }
 
+    /**
+     * runs {@link SnakePanel#update()} and {@link SnakePanel#draw(Canvas)} {@link MainThread#MAX_FPS}
+     * times a second
+     */
     @Override
     public void run() {
         Canvas canvas = null;

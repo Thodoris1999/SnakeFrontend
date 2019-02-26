@@ -18,6 +18,19 @@ import main.GameConfig;
 import main.PlayerType;
 import timber.log.Timber;
 
+/**
+ * The activity where the user plays configures the game
+ *
+ * @author Τυροβούζης Θεόδωρος
+ * AEM 9369
+ * phone number 6955253435
+ * email ttyrovou@ece.auth.gr
+ *
+ * @author Τσιμρόγλου Στυλιανός
+ * AEM 9468
+ * phone number 6977030504
+ * email stsimrog@ece.auth.gr
+ */
 public class MainMenuActivity extends AppCompatActivity {
 
     public static final String GAME_CONFIG_KEY = "game-config key";
@@ -27,6 +40,9 @@ public class MainMenuActivity extends AppCompatActivity {
     private Spinner player1TypeSpinner, player2TypeSpinner;
     private LinearLayout spinnersLayout;
 
+    /**
+     * Gets called when the activity is created. Initialized all fields
+     */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,6 +101,9 @@ public class MainMenuActivity extends AppCompatActivity {
         player2TypeSpinner.setAdapter(adapter);
     }
 
+    /**
+     * Called when the start button is clicked. Parses the input data and starts {@link MainActivity}
+     */
     public void startGame(View view) {
         int numRows = Integer.parseInt(numRowsEdittext.getText().toString());
         int numCols = Integer.parseInt(numColsEdittext.getText().toString());

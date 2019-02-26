@@ -11,6 +11,19 @@ import java.util.LinkedList;
 
 import main.PlayerState;
 
+/**
+ * Draws and animates the players sprites (circles)
+ *
+ * @author Τυροβούζης Θεόδωρος
+ * AEM 9369
+ * phone number 6955253435
+ * email ttyrovou@ece.auth.gr
+ *
+ * @author Τσιμρόγλου Στυλιανός
+ * AEM 9468
+ * phone number 6977030504
+ * email stsimrog@ece.auth.gr
+ */
 public class PlayerSprite extends BaseSprite implements Dice.OnDiceFinishedListener {
 
     public static final int ANIMATION_DURATION = 10; // in frames
@@ -42,6 +55,9 @@ public class PlayerSprite extends BaseSprite implements Dice.OnDiceFinishedListe
         this.animationCompletedListener = completedListener;
     }
 
+    /**
+     * Calculates the x and y coordinates of the progress of the current animation
+     */
     public void update() {
         if (animationRemainingFrames > 0) {
             animationRemainingFrames--;
@@ -69,6 +85,12 @@ public class PlayerSprite extends BaseSprite implements Dice.OnDiceFinishedListe
         return (float) (Math.cos((time + 1) * Math.PI) / 2 + 0.5);
     }
 
+    /**
+     * Consumes the first animation from the priority queue {@link PlayerSprite#animationQueue}
+     * @param xend the x position of the destination at the end of the animation
+     * @param yend the y position of the destination at the end of the animation
+     * @param duration the animation duration in frames
+     */
     private void consumeAnimation(float xend, float yend, int duration) {
         animationStartX = x;
         animationStartY = y;
@@ -77,6 +99,9 @@ public class PlayerSprite extends BaseSprite implements Dice.OnDiceFinishedListe
         animationRemainingFrames = duration;
     }
 
+    /**
+     * Consumes the first animation from the priority queue {@link PlayerSprite#animationQueue}
+     */
     public void consumeAnimation() {
         Animation animation = animationQueue.getFirst();
         consumeAnimation(animation.getDestination().left +
@@ -90,6 +115,11 @@ public class PlayerSprite extends BaseSprite implements Dice.OnDiceFinishedListe
         animationQueue.add(animation);
     }
 
+    /**
+     * Gets called when any animation finish is detected. Gives the appropriate callback to {@link com.ttyrovou.snake.panels.SnakePanel}
+     * based on the type of animation that was finished. Then tries to move on to the next animation,
+     * if it exists. Otherwise it dispatches the event that all animations are finished.
+     */
     public void onSmallAnimationFished() {
         if (animationQueue.getFirst().getType() == Animation.LADDER_OR_SNAKE ||
                 (animationQueue.size() > 1 && animationQueue.getFirst().getType() == Animation.WALK && animationQueue.get(1).getType() != Animation.WALK)) {
@@ -107,11 +137,17 @@ public class PlayerSprite extends BaseSprite implements Dice.OnDiceFinishedListe
         }
     }
 
+    /**
+     * Gets called when the dice finishes animating. Commands player animations to start
+     */
     @Override
     public void onDiceFinished() {
         consumeAnimation();
     }
 
+    /**
+     * Callback that dispatches the end of a certain type of animation
+     */
     public interface OnAnimationCompletedListener {
         void onWalkAnimationCompleted(PlayerState playerState);
         void onIntermediateAnimationCompleted(PlayerState playerState);

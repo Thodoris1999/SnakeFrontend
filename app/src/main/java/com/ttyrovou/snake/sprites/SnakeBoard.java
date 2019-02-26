@@ -9,6 +9,19 @@ import android.graphics.Rect;
 import main.Board;
 import main.PlayerState;
 
+/**
+ * Draws the board of the game and everything it contains
+ *
+ * @author Τυροβούζης Θεόδωρος
+ * AEM 9369
+ * phone number 6955253435
+ * email ttyrovou@ece.auth.gr
+ *
+ * @author Τσιμρόγλου Στυλιανός
+ * AEM 9468
+ * phone number 6977030504
+ * email stsimrog@ece.auth.gr
+ */
 public class SnakeBoard extends BaseSprite {
 
     private final int[] tileColors = {Color.RED, Color.WHITE, Color.GREEN, Color.YELLOW, Color.CYAN};
@@ -104,6 +117,11 @@ public class SnakeBoard extends BaseSprite {
         }
     }
 
+    /**
+     * Utility method to get tile object by their tileId instead of giving array arguments
+     * @param id the id requested
+     * @return the tile corresponding to that id
+     */
     public Tile getTileById(int id) {
         if (id == 0) {
             //starting tile
@@ -117,6 +135,9 @@ public class SnakeBoard extends BaseSprite {
         return tileBoard[tileBoard.length - 1 - row][column];
     }
 
+    /**
+     * Draws a single tile in a board along with its number on the top left
+     */
     public static class Tile extends BaseSprite {
 
         private Rect rect;

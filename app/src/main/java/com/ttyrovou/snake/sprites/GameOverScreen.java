@@ -10,6 +10,19 @@ import android.graphics.drawable.Drawable;
 import com.ttyrovou.snake.AndroidUtils;
 import com.ttyrovou.snake.R;
 
+/**
+ * Draws the game over screen
+ *
+ * @author Τυροβούζης Θεόδωρος
+ * AEM 9369
+ * phone number 6955253435
+ * email ttyrovou@ece.auth.gr
+ *
+ * @author Τσιμρόγλου Στυλιανός
+ * AEM 9468
+ * phone number 6977030504
+ * email stsimrog@ece.auth.gr
+ */
 public class GameOverScreen extends BaseSprite {
 
     private Rect rect;
@@ -57,10 +70,22 @@ public class GameOverScreen extends BaseSprite {
                 y + height - buttonIconSize / 2 + buttonIconSize);
     }
 
+    /**
+     * Checks if the retry button was clicked
+     * @param x the x position of the click event
+     * @param y the y position of the click event
+     * @return whether the button was clicked or not
+     */
     public boolean isRetryClciked(float x, float y) {
         return retryContainer.contains((int) x, (int) y);
     }
 
+    /**
+     * Checks if the main menu button was clicked
+     * @param x the x position of the click event
+     * @param y the y position of the click event
+     * @return whether the button was clicked or not
+     */
     public boolean isMainMenuClicked(float x, float y) {
         return mainMenuContainer.contains((int) x, (int) y);
     }
